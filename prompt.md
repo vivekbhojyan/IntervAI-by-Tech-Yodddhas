@@ -1427,3 +1427,463 @@ Notes:
 - The frontend dev server (Vite) was restarted and HMR applied the updates; open http://localhost:5173/ to view changes.
 - The backend remains at http://127.0.0.1:8000/ and is required for interview flows.
 - If you'd like, I can further refine icons, responsive behavior, or produce a production build.
+
+- User attachment
+is the structure correct?
+
+Yes — the structure is correct. ✅
+
+Your .env is directly inside the frontend folder:
+
+vicodathon/
+└── frontend/
+    ├── .env                  ✅
+    ├── package.json
+    ├── vite.config.js
+    ├── index.html
+    ├── src/
+    │   ├── App.jsx
+    │   ├── main.jsx
+    │   └── components/
+    └── public/
+Your .env should contain exactly:
+
+VITE_API_URL=https://intervai-by-tech-yodddhas.onrender.com
+And your API call should be:
+
+fetch(`${import.meta.env.VITE_API_URL}/api/interview`)
+One thing to check
+Make sure the file is actually named:
+
+.env
+and not:
+
+.env.txt
+Windows sometimes hides extensions.
+
+Then restart your frontend:
+
+cd frontend
+npm run dev
+For Vercel, also add the same VITE_API_URL under Project → Settings → Environment Variables, then redeploy.
+
+So far, your folder structure is exactly where it should be. 👍
+
+in localhost it woeks well but on render and vercel it does not working
+
+Yes — and this actually gives us a useful clue.
+
+Your local app working does not prove the deployed app is configured correctly. You now have two separate things to verify:
+
+Vercel frontend
+      ↓
+Render backend
+      ↓
+FastAPI
+I checked your Render URL, and the root / currently returns 404. That's not necessarily a problem—your FastAPI app may simply not define a / route. The important test is /docs and your actual /api/interview endpoint.
+
+1. Test Render first
+Open this in your browser:
+
+Render API documentation
+
+If /docs doesn't open, your problem is with the Render backend.
+
+If /docs opens, then Render is running and we need to check the frontend → backend connection.
+
+2. Check your Render start command
+In Render → your backend service → Settings, make sure:
+
+Root Directory
+
+backend
+Build Command
+
+pip install -r requirements.txt
+Start Command
+
+uvicorn main:app --host 0.0.0.0 --port $PORT
+Then look at Render → Logs.
+
+You should see something similar to:
+
+Application startup complete.
+Uvicorn running on http://0.0.0.0:10000
+3. Test the actual API
+Your frontend calls:
+
+/api/interview
+So the deployed API is:
+
+https://intervai-by-tech-yodddhas.onrender.com/api/interview
+If that endpoint expects a POST request, opening it directly in the browser may give 405 Method Not Allowed. That's okay.
+
+What's important is that your frontend sends the correct POST request.
+
+4. Check your frontend code
+You've already changed:
+
+fetch('http://localhost:8000/api/interview')
+to:
+
+fetch(`${import.meta.env.VITE_API_URL}/api/interview`)
+Good.
+
+But now search your entire src folder:
+
+Ctrl + Shift + F
+
+Search:
+
+localhost:8000
+You need to make sure there are no remaining frontend API calls pointing to localhost.
+
+Also search:
+
+127.0.0.1
+If you find another API request using it, change that too.
+
+5. Check Vercel environment variable
+In Vercel:
+
+Project → Settings → Environment Variables
+
+You should have:
+
+Name:
+VITE_API_URL
+
+Value:
+https://intervai-by-tech-yodddhas.onrender.com
+Then redeploy the frontend.
+
+This is important because adding .env locally does not automatically configure the Vercel deployment.
+
+6. Check CORS
+If Render /docs works but your Vercel app gives something like:
+
+Failed to fetch
+or the browser console says:
+
+Access to fetch has been blocked by CORS policy
+then your backend's CORS configuration is the problem.
+
+In backend/main.py, you need something like:
+
+from fastapi.middleware.cors import CORSMiddleware
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "https://YOUR-VERCEL-APP.vercel.app"
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+Replace the Vercel URL with your actual deployed Vercel URL.
+
+But don't change more things blindly
+At this point, the fastest way to find the exact problem is:
+
+First open:
+Your Render /docs endpoint
+
+Then tell me what you see.
+
+If it opens, send me the Vercel URL and the error from:
+
+Vercel website → F12 → Console
+
+For example:
+
+Failed to fetch
+or
+
+CORS policy
+or
+
+500 Internal Server Error
+or whatever appears.
+
+Then we can pinpoint whether it's Render, CORS, environment variables, API path, or Vercel instead of guessing.
+
+User attachment
+it is working well
+
+Great — if your localhost is working perfectly, then your frontend structure and .env setup are likely fine. 👍
+
+The problem is specifically in the deployment connection:
+
+Vercel frontend
+      ↓
+      ? 
+Render backend
+Let's isolate it.
+
+Do these 2 checks
+1. Open your Render backend:
+
+https://intervai-by-tech-yodddhas.onrender.com/docs
+If the FastAPI Swagger page opens → Render backend is running.
+
+2. Open your Vercel website → press F12 → Console
+
+Try the feature that calls /api/interview.
+
+If you see an error, send me a screenshot of the Console.
+
+Especially look for:
+
+CORS policy
+Failed to fetch
+404
+500
+502
+ERR_FAILED
+One correction from earlier
+Your .env being here:
+
+frontend/.env
+is correct.
+
+And this:
+
+VITE_API_URL=https://intervai-by-tech-yodddhas.onrender.com
+is also correct.
+
+And this:
+
+fetch(`${import.meta.env.VITE_API_URL}/api/interview`)
+is correct for Vite.
+
+So don't change those again.
+
+The next thing we need is the actual Vercel browser error. Send me that screenshot and I'll tell you exactly what to fix.
+
+https://intervai-by-tech-yodddhas.onrender.com/docs
+it is wrking well
+
+Perfect. That confirms Render is working. Your FastAPI backend is alive and Swagger is accessible. 
+
+So the remaining problem is almost certainly:
+
+Vercel frontend → Render API
+
+Your Vite setup is correct: Vite exposes VITE_* variables through import.meta.env, and .env is loaded when Vite builds the app. 
+
+Now do this exact test
+Open your Vercel deployed website.
+
+Press F12
+Go to Console
+Use the part of your website that starts an interview.
+Look at the error.
+Also go to Network → Fetch/XHR and click the /api/interview request.
+
+You should see something like:
+
+Request URL:
+https://intervai-by-tech-yodddhas.onrender.com/api/interview
+If you see this instead:
+http://localhost:8000/api/interview
+then Vercel is still serving your old build.
+
+In that case:
+
+Vercel → Settings → Environment Variables
+Confirm:
+VITE_API_URL
+=
+https://intervai-by-tech-yodddhas.onrender.com
+Go to Deployments
+Redeploy the latest deployment.
+Make sure you don't have an old .env.production overriding it.
+Vite gives mode-specific .env files higher priority than the normal .env, so an existing .env.production could override your value. 
+
+One more very important check
+In VS Code press:
+
+Ctrl + Shift + F
+
+Search:
+
+localhost:8000
+If any actual frontend source file still contains:
+
+http://localhost:8000
+change it.
+
+Send me this next
+I don't want you changing random things now. Since Render is confirmed working, send me a screenshot of your Vercel website's F12 → Console after clicking the interview button.
+
+That error will tell us exactly what is left.
+
+contentscript.js:14083 MaxListenersExceededWarning: Possible EventEmitter memory leak detected. 11 close listeners added. Use emitter.setMaxListeners() to increase limit
+contentscript.js:14083 MaxListenersExceededWarning: Possible EventEmitter memory leak detected. 11 end listeners added. Use emitter.setMaxListeners() to increase limit
+2
+contentscript.js:14083 ObjectMultiplex - orphaned data for stream "app-init-liveness"
+2
+contentscript.js:14083 ObjectMultiplex - orphaned data for stream "background-liveness"
+16
+The resource <URL> was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate as value and it is preloaded intentionally.
+2okpd0efl30i_.js:19 Deprecated API for given entry type.
+
+…
+
+Show more
+Those messages do not look like the actual reason your Vercel → Render connection is failing.
+
+In particular, contentscript.js usually comes from a browser extension, not your React application. The preload and deprecated-API warnings are also generally non-fatal.
+
+What we need now is the actual API request.
+
+Do this
+Open your Vercel website and:
+
+Press F12
+Select Network
+Select Fetch/XHR at the top
+Clear the existing requests 🗑️
+Click your Start Interview / Send / whatever triggers the backend
+A new request should appear.
+Click that request.
+Then send me a screenshot showing:
+
+Headers
+  Request URL
+  Request Method
+  Status Code
+The most important thing is Request URL.
+
+It should be:
+
+https://intervai-by-tech-yodddhas.onrender.com/api/interview
+If it says:
+
+http://localhost:8000/api/interview
+then we've found the problem immediately.
+
+If the URL is correct but you get something like:
+
+CORS error
+401
+404
+422
+500
+502
+then we'll fix that specific backend/deployment issue.
+
+Don't change your code yet. Send me the Network request details first; that's much more useful than these Console warnings.
+
+Request URL
+https://vercel.com/3628f7ea4ecd82e3/vitals
+Request Method
+POST
+Status Code
+200 OK
+Remote Address
+64.239.109.65:443
+Referrer Policy
+origin-when-cross-origin
+cache-control
+public, max-age=0, must-revalidate
+content-length
+0
+content-type
+text/plain; charset=utf-8
+cross-origin-resource-policy
+cross-origin
+date
+Sun, 09 Aug 2026 13:48:30 GMT
+server
+Vercel
+strict-transport-security
+max-age=63072000; includeSubDomains; preload
+x-ratelimit-limit
+1000
+x-ratelimit-remaining
+999
+x-ratelimit-reset
+60
+x-vercel-cache
+MISS
+x-vercel-id
+bom1::6lpdt-1786283310132-810e5d07e1ab
+:authority
+vercel.com
+:method
+POST
+:path
+/3628f7ea4ecd82e3/vitals
+:scheme
+https
+accept
+/
+accept-encoding
+gzip, deflate, br, zstd
+accept-language
+en-IN,en-GB;q=0.9,en-US;q=0.8,en;q=0.7,hi;q=0.6
+content-length
+1547
+content-type
+text/plain
+cookie
+_ga=GA1.2.771389116.1763925510; signals-sdk-user-id=5c647bb1-d015-4e7f-b304-384620e93bbd; __ssid=17eab8707337bad135c8239c6b1fe6f; authorization=Bearer%20PWQKo9UUP0ywvWTCRqIwqnEn; isLoggedIn=1; scope=viveks-projects-0109e3c0; __stripe_mid=0e22744d-5367-490a-b715-02a9747db8f583e778; rl_page_init_referrer=RS_ENC_v3_Imh0dHBzOi8vd3d3Lmdvb2dsZS5jb20vIg%3D%3D; rl_page_init_referring_domain=RS_ENC_v3_Ind3dy5nb29nbGUuY29tIg%3D%3D; rl_trait=RS_ENC_v3_eyJlbWFpbCI6InZpdmVrYmlqMDVAZ21haWwuY29tIiwic2Vjb25kYXJ5X2VtYWlscyI6W10sIm5hbWUiOm51bGwsInVzZXJuYW1lIjoidml2ZWtiaWowNS02NDYzIn0%3D; _v-consent=%7B%22essential%22%3Atrue%2C%22analytics%22%3Atrue%2C%22marketing%22%3Atrue%2C%22functional%22%3Atrue%2C%22version%22%3A1%7D; rl_user_id=RS_ENC_v3_IkZNdTM3bllCUW90eTNKUU1qQXNRSE9kciI%3D; _v-anonymous-id=JOdgibXqVbsNkJJKbYq5o; rl_anonymous_id=RS_ENC_v3_IkpPZGdpYlhxVmJzTmtKSktiWXE1byI%3D; visitor-id=kViiozFIb7iYUCrJ7_Hzl; _v-anonymous-id-renewed=1; vercel_session_id=MTkwMjQ1MjE2NSwzMDc1NDk5MDgwLDM1MTYyNTE4NTYsMTY2NzQyMTc5MiwxNzc5NzU5ODA=; Lda_aKUr6BGRn=duertry.com/r/v2?; Lda_aKUr6BGRr=0; _v-session={%22id%22:%22240d5b5c-3462-47aa-a49a-664a34ef9199%22%2C%22landing_page%22:%22; __stripe_sid=b85c18c9-e747-4011-bcd4-3350604e196acfaa24; Fm_kZf8ZQvmX=1; Ac_aqK8DtrDS=6; userCache=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyLWluZm8tY2FjaGUiLCJpYXQiOjE3ODYyODMyMTQsImV4cCI6MTgxNzgxOTIxNCwidWlkIjoiRk11MzduWUJRb3R5M0pRTWpBc1FIT2RyIiwidXNlcm5hbWUiOiJ2aXZla2JpajA1LTY0NjMiLCJlbWFpbCI6InZpdmVrYmlqMDVAZ21haWwuY29tIiwiaXNWZXJjZWxpYW4iOmZhbHNlLCJpc1BhcnRPZkFueUVudGVycHJpc2VUZWFtIjpmYWxzZSwiaGFzTm9UZWFtIjpmYWxzZSwiZGVmYXVsdFRlYW1JZCI6InRlYW1fclhCdE5uOUlZVjJPYlI2emhZZllVSE9WIiwiZGVmYXVsdFRlYW1TbHVnIjoidml2ZWtzLXByb2plY3RzLTAxMDllM2MwIiwiaXNOb3J0aHN0YXIiOnRydWUsIm5hbWUiOm51bGwsImF2YXRhciI6bnVsbH0.1sFmxiEzydYMYviWHeolLrPnf2LeTwhGIWUfitRac-Y; teamsCache=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyLXRlYW0tY2FjaGUiLCJpYXQiOjE3ODYyODMyMTQsImV4cCI6MTgxNzgxOTIxNCwidGVhbVNsdWdJZE1hcCI6eyJ2aXZla3MtcHJvamVjdHMtMDEwOWUzYzAiOiJ0ZWFtX3JYQnRObjlJWVYyT2JSNnpoWWZZVUhPViJ9fQ.hoJZK6quFMuKD4UvDm_eVV0sQELXS6X7JAu6_xQUxf8; rl_session=RS_ENC_v3_eyJhdXRvVHJhY2siOnRydWUsInRpbWVvdXQiOjE4MDAwMDAsImV4cGlyZXNBdCI6MTc4NjI4NTAyMDA0MywiaWQiOjE3ODYyODIzNzMxMjcsInNlc3Npb25TdGFydCI6ZmFsc2V9
+origin
+
+priority
+u=1, i
+referer
+
+sec-ch-prefers-color-scheme
+dark
+sec-ch-ua
+"Not=A?Brand";v="99", "Google Chrome";v="151", "Chromium";v="151"
+sec-ch-ua-mobile
+?0
+sec-ch-ua-platform
+"Windows"
+sec-fetch-dest
+empty
+sec-fetch-mode
+no-cors
+sec-fetch-site
+same-origin
+user-agent
+Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36
+
+…
+
+Show more
+That request is not your API request. It is Vercel's own telemetry:
+
+https://vercel.com/.../vitals
+So it doesn't tell us whether your frontend can reach Render.
+
+Also, your pasted headers contain Vercel session/authentication cookies. Don't share those publicly. Since you've exposed them here, it's safest to log out of Vercel and log back in.
+
+Do this instead
+Open your actual deployed Vercel website, not the Vercel dashboard.
+Press F12.
+Go to Network.
+Select Fetch/XHR.
+Click Clear.
+Use your app — click the button that sends the interview request.
+Look for a request containing:
+/api/interview
+Click it and send me only these 4 things:
+
+Request URL:
+Request Method:
+Status Code:
+Response:
+The Request URL should look like:
+
+https://intervai-by-tech-yodddhas.onrender.com/api/interview
+If instead you see:
+
+http://localhost:8000/api/interview
+then your Vercel frontend is still using the local backend.
+
+If you don't see any /api/interview request at all, tell me that too — that means the problem is likely in the frontend code/config rather than Render.
