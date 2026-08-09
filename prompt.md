@@ -1523,7 +1523,7 @@ What's important is that your frontend sends the correct POST request.
 4. Check your frontend code
 You've already changed:
 
-fetch('${import.meta.env.VITE_API_URL}/api/interview')
+fetch(`${import.meta.env.VITE_API_URL}/api/interview')
 to:
 
 fetch(`${import.meta.env.VITE_API_URL}/api/interview`)
