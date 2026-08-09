@@ -29,6 +29,8 @@ class Candidate(BaseModel):
 class StartInterviewRequest(BaseModel):
     sessionId: str
     candidate: Candidate
+    domain: Optional[int] = None
+
 
 class ContinueInterviewRequest(BaseModel):
     sessionId: str
@@ -40,10 +42,18 @@ class FinalFeedback(BaseModel):
     gaps: List[str]
     next: List[str]
 
+class InterviewProgress(BaseModel):
+    phase: str
+    question_count: int
+    max_questions: int
+    topics_covered: List[int]
+
 class InterviewResponse(BaseModel):
     reply: str
     done: bool
     feedback: Optional[FinalFeedback] = None
+    progress: Optional[InterviewProgress] = None
+
 
 # Internal Models for LLM Output
 
@@ -54,6 +64,10 @@ class LLMEvaluation(BaseModel):
     identified_strengths: List[str]
     identified_gaps: List[str]
     recommended_action: str = Field(description="E.g., follow_up, change_topic, increase_difficulty, end_interview")
+    is_non_answer: bool = Field(
+        default=False,
+        description="True when the candidate did not attempt a substantive answer",
+    )
 
 class LLMNextQuestion(BaseModel):
     curriculum_day: int = Field(description="The curriculum day number this question targets")
@@ -66,3 +80,7 @@ class LLMFeedback(BaseModel):
     strengths: List[str] = Field(description="Specific, evidence-based strengths")
     gaps: List[str] = Field(description="Specific knowledge gaps")
     next: List[str] = Field(description="Actionable next steps")
+
+class LLMTurnOutput(BaseModel):
+    evaluation: LLMEvaluation
+    next_step: LLMNextQuestion

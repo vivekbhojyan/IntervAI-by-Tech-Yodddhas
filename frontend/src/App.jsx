@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import ChatInterface from './components/ChatInterface';
 import ProgressPanel from './components/ProgressPanel';
 import FeedbackModal from './components/FeedbackModal';
+import DomainSelector from './components/DomainSelector';
 import candidatesData from '../../candidates.json';
 
 function App() {
@@ -15,6 +16,8 @@ function App() {
 
   // Stats for the progress panel
   const [questionCount, setQuestionCount] = useState(0);
+  const [progress, setProgress] = useState(null);
+  const [selectedDomain, setSelectedDomain] = useState(null);
 
   useEffect(() => {
     // Generate a unique session ID
@@ -31,13 +34,16 @@ function App() {
       const response = await fetch('http://localhost:8000/api/interview', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sessionId, candidate })
+        body: JSON.stringify({ sessionId, candidate, domain: selectedDomain })
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.detail || 'Failed to start interview');
       
       setMessages([{ role: 'interviewer', content: data.reply }]);
       setQuestionCount(1);
+      if (data.progress) {
+        setProgress(data.progress);
+      }
     } catch (err) {
       setError(err.message);
     } finally {
@@ -70,6 +76,9 @@ function App() {
       if (data.feedback) {
         setFeedback(data.feedback);
       }
+      if (data.progress) {
+        setProgress(data.progress);
+      }
     } catch (err) {
       setError(err.message);
     } finally {
@@ -80,7 +89,7 @@ function App() {
   return (
     <div className="flex h-screen bg-gray-900 overflow-hidden font-sans text-gray-100">
       
-      {/* LEFT PANEL: Chat */}
+      {/* LEFT PANEL: Chat & Domain Selection */}
       <div className="flex-1 flex flex-col border-r border-gray-700 bg-gray-800">
         <header className="px-6 py-4 border-b border-gray-700 bg-gray-900 shadow-sm z-10 flex justify-between items-center">
           <div>
@@ -91,22 +100,40 @@ function App() {
             <button 
               onClick={startInterview}
               disabled={isLoading}
-              className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 rounded-lg text-sm font-medium transition-colors shadow-lg shadow-indigo-900"
+              className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 rounded-lg text-sm font-medium transition-colors shadow-lg shadow-indigo-900 flex items-center gap-2"
             >
+              {isLoading && <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>}
               Start Interview
             </button>
           )}
         </header>
 
-        <main className="flex-1 overflow-hidden relative">
-          <ChatInterface 
-            messages={messages} 
-            isLoading={isLoading} 
-            onSendMessage={sendMessage} 
-            error={error}
-          />
+        <main className="flex-1 overflow-y-auto relative p-6">
+          {messages.length === 0 ? (
+            <div className="max-w-4xl mx-auto space-y-6">
+              <div className="bg-gray-900/90 border border-gray-700 p-6 rounded-2xl shadow-xl">
+                <h2 className="text-lg font-bold text-gray-200 mb-1">Welcome to your Technical Interview</h2>
+                <p className="text-sm text-gray-400">
+                  The AI Interview Agent will adaptively test your technical depth based on your candidate profile. You may select a target domain module below or proceed with the full curriculum.
+                </p>
+              </div>
+
+              <DomainSelector
+                selectedDomain={selectedDomain}
+                onSelectDomain={setSelectedDomain}
+              />
+            </div>
+          ) : (
+            <ChatInterface 
+              messages={messages} 
+              isLoading={isLoading} 
+              onSendMessage={sendMessage} 
+              error={error}
+            />
+          )}
         </main>
       </div>
+
 
       {/* RIGHT PANEL: Progress / Stats */}
       <div className="w-80 flex flex-col bg-gray-900 p-6 overflow-y-auto">
@@ -114,8 +141,10 @@ function App() {
           candidate={candidate} 
           questionCount={questionCount} 
           isDone={isDone}
+          progress={progress}
         />
       </div>
+
 
       {/* MODAL: Final Feedback */}
       {isDone && feedback && (
