@@ -1391,3 +1391,39 @@ The final product should make a hackathon judge think:
 "This isn't an LLM wrapped around eight questions. This is an actual technical interviewer."
 
 Build the interviewer, not the interview.
+
+
+---
+
+## Frontend changes applied (summary)
+
+Below are the concrete frontend improvements I applied to make the UI more elegant and professional. These were implemented and hot-reloaded in the local Vite dev server.
+
+- Typography & head: added Inter font and updated the page title.
+  - File: `frontend/index.html`
+
+- Theming & utilities: added theme CSS variables, polished gradients, scrollbar, and utility classes.
+  - File: `frontend/src/index.css`
+
+- Global layout and surfaces: added card surfaces, header and panel styles for a more modern aesthetic.
+  - File: `frontend/src/App.css`
+
+- Header & container: improved header with logo, brand badge, and applied new container classes.
+  - File: `frontend/src/App.jsx`
+
+- Chat UI: glass-panel chat container, refined message bubbles, avatars, timestamps, and improved input styling.
+  - File: `frontend/src/components/ChatInterface.jsx`
+
+- Domain selector: elevated domain cards with hover, accessible role/aria attributes, and card styling.
+  - File: `frontend/src/components/DomainSelector.jsx`
+
+- Progress panel: added avatar, gradient progress bar, and card layout for clearer status visuals.
+  - File: `frontend/src/components/ProgressPanel.jsx`
+
+- Feedback modal: updated to use card surface and primary button styles for consistency.
+  - File: `frontend/src/components/FeedbackModal.jsx`
+
+Notes:
+- The frontend dev server (Vite) was restarted and HMR applied the updates; open http://localhost:5173/ to view changes.
+- The backend remains at http://127.0.0.1:8000/ and is required for interview flows.
+- If you'd like, I can further refine icons, responsive behavior, or produce a production build.
