@@ -1523,7 +1523,7 @@ What's important is that your frontend sends the correct POST request.
 4. Check your frontend code
 You've already changed:
 
-fetch('http://localhost:8000/api/interview')
+fetch('${import.meta.env.VITE_API_URL}/api/interview')
 to:
 
 fetch(`${import.meta.env.VITE_API_URL}/api/interview`)
@@ -1686,7 +1686,7 @@ You should see something like:
 Request URL:
 https://intervai-by-tech-yodddhas.onrender.com/api/interview
 If you see this instead:
-http://localhost:8000/api/interview
+${import.meta.env.VITE_API_URL}/api/interview
 then Vercel is still serving your old build.
 
 In that case:
@@ -1711,7 +1711,7 @@ Search:
 localhost:8000
 If any actual frontend source file still contains:
 
-http://localhost:8000
+${import.meta.env.VITE_API_URL}
 change it.
 
 Send me this next
@@ -1761,7 +1761,7 @@ It should be:
 https://intervai-by-tech-yodddhas.onrender.com/api/interview
 If it says:
 
-http://localhost:8000/api/interview
+${import.meta.env.VITE_API_URL}/api/interview
 then we've found the problem immediately.
 
 If the URL is correct but you get something like:
@@ -1883,7 +1883,7 @@ The Request URL should look like:
 https://intervai-by-tech-yodddhas.onrender.com/api/interview
 If instead you see:
 
-http://localhost:8000/api/interview
+${import.meta.env.VITE_API_URL}/api/interview
 then your Vercel frontend is still using the local backend.
 
 If you don't see any /api/interview request at all, tell me that too — that means the problem is likely in the frontend code/config rather than Render.

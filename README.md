@@ -100,7 +100,7 @@ Initializes an interview or submits the next turn.
 2. Create and activate a virtual environment: `python -m venv venv` and `source venv/bin/activate` (or `venv\Scripts\Activate.ps1` on Windows).
 3. Install dependencies: `pip install -r requirements.txt`
 4. Set your API Key: `export OPENAI_API_KEY=your_key_here` (or via `.env` file)
-5. Start server: `uvicorn main:app --reload` (Runs on `http://localhost:8000`)
+5. Start server: `uvicorn main:app --reload` (Runs on `${import.meta.env.VITE_API_URL}`)
 
 ### Frontend
 1. `cd frontend`

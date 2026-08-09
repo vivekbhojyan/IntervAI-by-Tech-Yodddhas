@@ -7,7 +7,7 @@ function DomainSelector({ selectedDomain, onSelectDomain }) {
   useEffect(() => {
     async function fetchDomains() {
       try {
-        const res = await fetch('http://localhost:8000/api/domains');
+        const res = await fetch('${import.meta.env.VITE_API_URL}/api/domains');
         if (res.ok) {
           const data = await res.json();
           setDomains(data);

@@ -31,7 +31,7 @@ function App() {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await fetch('http://localhost:8000/api/interview', {
+      const response = await fetch('${import.meta.env.VITE_API_URL}/api/interview', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ sessionId, candidate, domain: selectedDomain })
@@ -60,7 +60,7 @@ function App() {
     setError(null);
 
     try {
-      const response = await fetch('http://localhost:8000/api/interview', {
+      const response = await fetch('${import.meta.env.VITE_API_URL}/api/interview', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ sessionId, message })
