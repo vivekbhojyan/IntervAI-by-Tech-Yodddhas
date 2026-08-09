@@ -35,7 +35,8 @@ Answer Evaluator & Question Planner (Internal JSON evaluations)
 
 ## State Management
 
-Interview state is maintained server-side mapping `sessionId` to an `InterviewState` Pydantic model. The state tracks asked questions, covered topics, history, and internal LLM evaluations. This prevents the LLM from losing context and ensures the mandatory constraints (e.g., minimum 8 questions) are enforced independently of the model.
+Interview state is maintained server-side mapping `sessionId` to an `InterviewState` Pydantic model. The state tracks asked questions, covered topics, history, internal LLM evaluations, and timestamps (`created_at`, `last_active`). To prevent memory leaks from abandoned sessions, an in-memory session TTL mechanism purges sessions that have been inactive for more than 2 hours (7200 seconds) on incoming requests. This prevents the LLM from losing context and ensures the mandatory constraints (e.g., maximum 15 questions) are enforced independently of the model.
+
 
 ## API Documentation
 
@@ -112,6 +113,7 @@ Run tests by executing `pytest` inside the `backend/` directory. Tests cover the
 
 ## Design Decisions
 
-- **FastAPI**: Chosen for rapid development, native Pydantic validation (which perfectly matches the OpenAI structured output feature), and asynchronous support.
-- **OpenAI Structured Outputs**: Instead of fragile prompt engineering to extract JSON, we force the model to output a Pydantic schema using `.parse()`. This guarantees the LLM reliably produces evaluation metrics and curriculum selection.
+- **FastAPI**: Chosen for rapid development, native Pydantic validation, and asynchronous support.
+- **JSON-Mode & Pydantic Validation**: We use JSON-mode generation (`response_format={"type": "json_object"}`) combined with explicit Pydantic `.model_validate()` validation and safe fallback defaults on failure. This ensures robust parsing across OpenAI-compatible providers like Groq without relying on provider-specific `.parse()` methods.
 - **React + TailwindCSS**: Provides a fast, dynamic, and aesthetically premium user interface with minimal bundle size. Glassmorphic effects and animations make the interview feel modern.
+

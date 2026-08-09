@@ -1,13 +1,17 @@
-function ProgressPanel({ candidate, questionCount, isDone }) {
+function ProgressPanel({ candidate, questionCount, isDone, progress }) {
   if (!candidate) return <div className="text-gray-500 text-sm">Loading candidate...</div>;
 
-  // Derive phase based on question count to mirror backend logic
-  let phase = "Warm-up";
-  if (questionCount >= 2) phase = "Core Technical";
-  if (questionCount >= 4) phase = "Deep Dive";
-  if (questionCount >= 6) phase = "Production";
-  if (questionCount >= 7) phase = "Final";
-  if (isDone) phase = "Completed";
+  // Use server progress or derive fallback values
+  let derivedPhase = "Warm-up";
+  if (questionCount >= 2) derivedPhase = "Core Technical";
+  if (questionCount >= 4) derivedPhase = "Deep Dive";
+  if (questionCount >= 6) derivedPhase = "Production";
+  if (questionCount >= 7) derivedPhase = "Final";
+
+  const phase = isDone ? "Completed" : (progress?.phase || derivedPhase);
+  const currentQ = progress?.question_count ?? questionCount;
+  const maxQ = progress?.max_questions ?? 15;
+  const topicsCovered = progress?.topics_covered || [];
 
   return (
     <div className="flex flex-col space-y-6">
@@ -32,14 +36,19 @@ function ProgressPanel({ candidate, questionCount, isDone }) {
             <div className="w-full bg-gray-700 rounded-full h-1.5">
               <div 
                 className="bg-indigo-500 h-1.5 rounded-full transition-all duration-500" 
-                style={{ width: `${Math.min((questionCount / 8) * 100, 100)}%` }}
+                style={{ width: `${Math.min((currentQ / maxQ) * 100, 100)}%` }}
               ></div>
             </div>
           </div>
 
           <div className="pt-2 flex justify-between items-center border-t border-gray-700">
             <span className="text-xs text-gray-400">Questions</span>
-            <span className="text-sm font-medium text-gray-200">{questionCount}</span>
+            <span className="text-sm font-medium text-gray-200">Question {currentQ} of ~{maxQ}</span>
+          </div>
+
+          <div className="pt-2 flex justify-between items-center border-t border-gray-700">
+            <span className="text-xs text-gray-400">Days Covered</span>
+            <span className="text-sm font-medium text-indigo-300">{topicsCovered.length} day{topicsCovered.length === 1 ? '' : 's'}</span>
           </div>
 
         </div>
@@ -66,3 +75,4 @@ function ProgressPanel({ candidate, questionCount, isDone }) {
 }
 
 export default ProgressPanel;
+
