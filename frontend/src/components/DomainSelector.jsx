@@ -13,7 +13,7 @@ function DomainSelector({ selectedDomain, onSelectDomain }) {
           setDomains(data);
         }
       } catch (e) {
-        console.error('Failed to fetch domains', e);
+        console.error('Failed to fetch Domains', e);
       } finally {
         setLoading(false);
       }
