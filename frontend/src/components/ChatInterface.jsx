@@ -21,7 +21,7 @@ function ChatInterface({ messages, isLoading, onSendMessage, error }) {
   };
 
   return (
-    <div className="flex flex-col h-full bg-gray-800">
+    <div className="flex flex-col h-full bg-transparent glass-panel rounded-2xl overflow-hidden">
       <div className="flex-1 overflow-y-auto p-6 space-y-6">
         {messages.length === 0 && (
           <div className="flex items-center justify-center h-full text-gray-500">
@@ -31,17 +31,22 @@ function ChatInterface({ messages, isLoading, onSendMessage, error }) {
         {messages.map((msg, idx) => (
           <div 
             key={idx} 
-            className={`flex ${msg.role === 'candidate' ? 'justify-end' : 'justify-start'} animate-fade-in-up`}
+            className={`flex ${msg.role === 'candidate' ? 'justify-end' : 'justify-start'} items-end gap-3 animate-fade-in-up`}
           >
-            <div 
-              className={`max-w-[75%] rounded-2xl px-5 py-4 shadow-md ${
-                msg.role === 'candidate' 
-                  ? 'bg-indigo-600 text-white rounded-br-none' 
-                  : 'bg-gray-700 text-gray-100 rounded-bl-none border border-gray-600'
-              }`}
-            >
+            {msg.role !== 'candidate' && (
+              <div className="avatar" style={{background:'#111827'}} aria-hidden>
+                AI
+              </div>
+            )}
+            <div className={`max-w-[75%] rounded-2xl px-5 py-4 shadow-md ${msg.role === 'candidate' ? 'bg-indigo-600 text-white rounded-br-none' : 'bg-gray-800 text-gray-100 rounded-bl-none border border-gray-700'}`}>
               <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.content}</p>
+              <div className="text-[11px] text-gray-400 mt-2 text-right">{new Date(msg.ts || Date.now()).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</div>
             </div>
+            {msg.role === 'candidate' && (
+              <div className="avatar" style={{background:'#4338ca'}} aria-hidden>
+                {Array.isArray(msg.senderInitials) ? msg.senderInitials.join('') : (msg.senderInitials || 'Y')}
+              </div>
+            )}
           </div>
         ))}
         {isLoading && (
@@ -61,11 +66,11 @@ function ChatInterface({ messages, isLoading, onSendMessage, error }) {
         <div ref={messagesEndRef} />
       </div>
 
-      <div className="p-4 bg-gray-900 border-t border-gray-700">
+      <div className="p-4 bg-gradient-to-t from-black/20 to-transparent border-t border-gray-800">
         <form onSubmit={handleSubmit} className="relative flex items-center">
           <input
             type="text"
-            className="w-full bg-gray-800 border border-gray-600 rounded-full pl-5 pr-12 py-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm placeholder-gray-400 shadow-inner"
+            className="w-full bg-transparent border border-gray-700 rounded-full pl-5 pr-12 py-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm placeholder-gray-400 shadow-inner"
             placeholder={messages.length === 0 ? "Waiting for interview to start..." : "Type your answer..."}
             value={input}
             onChange={(e) => setInput(e.target.value)}

@@ -7,7 +7,7 @@ function DomainSelector({ selectedDomain, onSelectDomain }) {
   useEffect(() => {
     async function fetchDomains() {
       try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/domains`);
+        const res = await fetch('http://localhost:8000/api/domains');
         if (res.ok) {
           const data = await res.json();
           setDomains(data);
@@ -22,7 +22,7 @@ function DomainSelector({ selectedDomain, onSelectDomain }) {
   }, []);
 
   return (
-    <div className="mb-6 bg-gray-800/80 backdrop-blur-md rounded-2xl p-6 border border-gray-700 shadow-xl">
+    <div className="mb-6 card glass-panel p-6">
       <div className="flex justify-between items-center mb-4">
         <div>
           <h2 className="text-base font-semibold text-gray-200">Select Focus Domain</h2>
@@ -40,11 +40,13 @@ function DomainSelector({ selectedDomain, onSelectDomain }) {
           {/* Default Option: Full Curriculum */}
           <div
             onClick={() => onSelectDomain(null)}
-            className={`cursor-pointer p-3.5 rounded-xl border text-left transition-all ${
+            className={`cursor-pointer p-3.5 rounded-xl border text-left transition-all domain-card ${
               selectedDomain === null
-                ? 'bg-indigo-600/20 border-indigo-500 text-white shadow-lg shadow-indigo-950/40 ring-1 ring-indigo-500'
+                ? 'bg-indigo-600/12 border-indigo-500 text-white shadow-lg ring-1 ring-indigo-500'
                 : 'bg-gray-900/60 border-gray-700 text-gray-300 hover:border-gray-600 hover:bg-gray-900'
             }`}
+            role="button"
+            aria-pressed={selectedDomain === null}
           >
             <div className="flex items-center justify-between mb-1">
               <span className="text-xs font-semibold uppercase tracking-wider text-indigo-400">All Modules</span>
@@ -63,11 +65,13 @@ function DomainSelector({ selectedDomain, onSelectDomain }) {
               <div
                 key={d.number}
                 onClick={() => onSelectDomain(d.number)}
-                className={`cursor-pointer p-3.5 rounded-xl border text-left transition-all ${
+                className={`cursor-pointer p-3.5 rounded-xl border text-left transition-all domain-card ${
                   isSelected
                     ? 'bg-indigo-600/20 border-indigo-500 text-white shadow-lg shadow-indigo-950/40 ring-1 ring-indigo-500'
                     : 'bg-gray-900/60 border-gray-700 text-gray-300 hover:border-gray-600 hover:bg-gray-900'
                 }`}
+                role="button"
+                aria-pressed={isSelected}
               >
                 <div className="flex items-center justify-between mb-1">
                   <span className="text-xs font-semibold uppercase tracking-wider text-gray-400">Module {d.number}</span>

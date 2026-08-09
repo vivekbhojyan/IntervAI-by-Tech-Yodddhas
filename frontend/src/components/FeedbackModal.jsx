@@ -3,19 +3,22 @@ function FeedbackModal({ feedback, candidate }) {
 
   return (
     <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 sm:p-8 animate-fade-in">
-      <div className="bg-gray-900 border border-gray-700 rounded-2xl shadow-2xl w-full max-w-4xl max-h-full overflow-hidden flex flex-col animate-slide-up">
+      <div className="bg-gray-900 border border-gray-700 rounded-2xl shadow-2xl w-full max-w-4xl max-h-full overflow-hidden flex flex-col animate-slide-up card">
         
-        <div className="p-6 border-b border-gray-700 flex justify-between items-center bg-gray-800">
+        <div className="p-6 border-b border-gray-700 flex justify-between items-center bg-transparent">
           <div>
             <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent">Interview Complete</h2>
             <p className="text-sm text-gray-400 mt-1">Final Assessment for {candidate?.member?.name}</p>
           </div>
-          <button 
-            onClick={() => window.location.reload()}
-            className="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-sm font-medium transition-colors"
-          >
-            Start New Interview
-          </button>
+          <div className="flex items-center gap-3">
+            <button 
+              onClick={() => window.location.reload()}
+              className="px-4 py-2 btn-primary text-sm font-medium"
+            >
+              Start New Interview
+            </button>
+            <button onClick={() => window.history.back()} className="px-3 py-2 bg-gray-800 rounded-lg text-sm">Close</button>
+          </div>
         </div>
 
         <div className="p-6 overflow-y-auto space-y-8 bg-gray-900">

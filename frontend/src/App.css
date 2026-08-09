@@ -17,6 +17,23 @@
   }
 }
 
+/* more polished header */
+.app-header {
+  background: linear-gradient(90deg, rgba(15,23,42,0.95), rgba(11,12,20,0.9));
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+}
+
+.panel-side {
+  background: linear-gradient(180deg, rgba(8,10,14,0.95), rgba(10,12,20,0.98));
+  border-left: 1px solid rgba(255,255,255,0.03);
+}
+
+.card-surface {
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  border: 1px solid rgba(255,255,255,0.03);
+  box-shadow: 0 6px 24px rgba(2,6,23,0.6);
+}
+
 .hero {
   position: relative;
 

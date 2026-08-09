@@ -31,7 +31,7 @@ function App() {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/interview`, {
+      const response = await fetch('http://localhost:8000/api/interview', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ sessionId, candidate, domain: selectedDomain })
@@ -60,7 +60,7 @@ function App() {
     setError(null);
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/interview`, {
+      const response = await fetch('http://localhost:8000/api/interview', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ sessionId, message })
@@ -87,20 +87,25 @@ function App() {
   };
 
   return (
-    <div className="flex h-screen bg-gray-900 overflow-hidden font-sans text-gray-100">
+    <div className="flex h-screen app-shell overflow-hidden font-sans text-gray-100 p-4">
       
       {/* LEFT PANEL: Chat & Domain Selection */}
-      <div className="flex-1 flex flex-col border-r border-gray-700 bg-gray-800">
-        <header className="px-6 py-4 border-b border-gray-700 bg-gray-900 shadow-sm z-10 flex justify-between items-center">
+      <div className="flex-1 flex flex-col panel-left card-surface">
+        <header className="px-6 py-4 app-header shadow-sm z-10 flex justify-between items-center">
           <div>
-            <h1 className="text-xl font-bold bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent">AI Interview Agent</h1>
-            <p className="text-sm text-gray-400">Interviewing: {candidate?.member?.name} ({candidate?.member?.jobRole})</p>
+            <div className="brand-badge">
+              <img src="/favicon.svg" alt="logo" className="w-8 h-8" />
+              <div>
+                <h1 className="text-xl font-bold bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent">AI Interview Agent</h1>
+                <p className="text-sm text-gray-400">Interviewing: {candidate?.member?.name} ({candidate?.member?.jobRole})</p>
+              </div>
+            </div>
           </div>
           {messages.length === 0 && (
             <button 
               onClick={startInterview}
               disabled={isLoading}
-              className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 rounded-lg text-sm font-medium transition-colors shadow-lg shadow-indigo-900 flex items-center gap-2"
+              className="btn-primary flex items-center gap-2"
             >
               {isLoading && <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>}
               Start Interview

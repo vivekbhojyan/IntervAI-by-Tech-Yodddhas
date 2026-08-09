@@ -5,5 +5,67 @@
 @layer base {
   body {
     @apply bg-gray-900 text-gray-100 antialiased;
+    font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
   }
 }
+
+:root {
+  --bg-gradient: linear-gradient(180deg, rgba(17,24,39,1) 0%, rgba(12,11,22,1) 100%);
+  --panel-bg: rgba(17,24,39,0.8);
+  --muted: #9CA3AF;
+  --accent: #6366F1;
+}
+
+/* polished container style used across panels */
+.app-shell {
+  background: var(--bg-gradient);
+}
+
+.glass-panel {
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  border: 1px solid rgba(255,255,255,0.03);
+  backdrop-filter: blur(6px);
+}
+
+.brand-badge {
+  display:inline-flex;align-items:center;gap:10px;font-weight:700;
+}
+
+.fade-in { animation: fadeIn .28s ease both }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(6px) } to { opacity:1; transform:none } }
+
+/* Elegant theme refinements */
+:root {
+  --bg-top: #0b1220;
+  --bg-bottom: #05060a;
+  --card: rgba(255,255,255,0.03);
+  --glass: rgba(255,255,255,0.02);
+  --muted-2: #94a3b8;
+  --accent-2: #7c3aed;
+}
+
+body {
+  background: radial-gradient(1200px 400px at 10% 10%, rgba(124,58,237,0.06), transparent), linear-gradient(180deg,var(--bg-top),var(--bg-bottom));
+}
+
+/* smoother scrollbar */
+*::-webkit-scrollbar { height:10px; width:10px }
+*::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.05); border-radius: 999px; }
+
+.btn-primary {
+  background-image: linear-gradient(90deg,var(--accent-2),#4f46e5);
+  color: white; padding: 8px 14px; border-radius: 10px; box-shadow: 0 6px 18px rgba(15,23,42,0.6);
+  transition: transform .12s ease, box-shadow .12s ease;
+}
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 26px rgba(15,23,42,0.7); }
+
+.card { background: var(--card); border: 1px solid rgba(255,255,255,0.03); border-radius: 14px; padding: 14px; }
+
+.domain-card { transition: transform .18s ease, box-shadow .18s ease; }
+.domain-card:hover { transform: translateY(-6px); box-shadow: 0 12px 32px rgba(2,6,23,0.6); }
+
+.avatar { width:36px; height:36px; border-radius:999px; display:inline-flex; align-items:center; justify-content:center; font-weight:700; color:white; }
+
+
